@@ -27,13 +27,16 @@ int main() {
 	signal(2, fun);
 
 	shmpid = shmget(KEY_PID, sizeof(short), 0600 | IPC_CREAT);
-	shmtabella = shmget(KEY_ARRAY, sizeof(int) * 9, 0600 | IPC_CREAT);
+	shmtabella = shmget(KEY_ARRAY, sizeof(char) * 9, 0600 | IPC_CREAT);
 
 	short *pid = (short*) shmat(shmpid, NULL, 0);
-	int *tabella = (int*) shmat(shmpid, NULL, 0);
+	char *tabella = (char*) shmat(shmpid, NULL, 0);
 
 	sempid = semget(KEY_PID, 1 ,IPC_CREAT | IPC_EXCL | 0600);
 	semtabella = semget(KEY_ARRAY, 1 ,IPC_CREAT | IPC_EXCL | 0600);
+
+
+
 
 
 	struct sembuf up;
@@ -47,10 +50,8 @@ int main() {
 	down.sem_flg = 0;
 
 	while (1) {
-		//sleep(1);
-		//semop(sem, &down, 0); 
-		//printf("%d", *i); 
-		//semop(sem, &up, 0);
+		printf("Waiting for players...")
+		execlp("clear", "clear", NULL);
 	}
 }
 
