@@ -8,36 +8,43 @@
 #include <sys/sem.h>
 #include <signal.h>
 
-#define KEY_PID 110
+#define KEY_TURN 115
 #define KEY_ARRAY 111
+#define KEY_READY 112
 
-int shmpid, shmtabella, sempid, semtabella;
-short *pid;
+int shmturn, shmtabella, shmready, semturn, semtabella;
+int* turn;
+int* ready;
+
+void lineclear() {
+	printf("\33[2K\r");
+}
 
 void fun(int sig) {
-    semctl(sempid, 1, IPC_RMID);
-    shmctl(shmpid ,IPC_RMID, NULL);
+	printf("\n");
+    semctl(semturn, 1, IPC_RMID);
+    shmctl(shmturn ,IPC_RMID, NULL);
     semctl(semtabella, 1, IPC_RMID);
     shmctl(shmtabella ,IPC_RMID, NULL);    
-    exit(0);	
+	shmctl(shmready ,IPC_RMID, NULL);    
+    exit(0);
 }
 
 int main() {
-
+	int animIndex = 0;
+	char loadAnim[] = {'/', '-', '\\', '|'};
 	signal(2, fun);
 
-	shmpid = shmget(KEY_PID, sizeof(short), 0600 | IPC_CREAT);
+	shmturn = shmget(KEY_TURN, sizeof(int), 0600 | IPC_CREAT);
 	shmtabella = shmget(KEY_ARRAY, sizeof(char) * 9, 0600 | IPC_CREAT);
+	shmready = shmget(KEY_READY, sizeof(int), 0600 | IPC_CREAT);
 
-	short *pid = (short*) shmat(shmpid, NULL, 0);
-	char *tabella = (char*) shmat(shmpid, NULL, 0);
+	turn = (int*) shmat(shmturn, NULL, 0);
+	ready = (int*) shmat(shmready, NULL, 0);
+	char *tabella = (char*) shmat(shmtabella, NULL, 0);
 
-	sempid = semget(KEY_PID, 1 ,IPC_CREAT | IPC_EXCL | 0600);
+	semturn = semget(KEY_TURN, 1 ,IPC_CREAT | IPC_EXCL | 0600);
 	semtabella = semget(KEY_ARRAY, 1 ,IPC_CREAT | IPC_EXCL | 0600);
-
-
-
-
 
 	struct sembuf up;
 	up.sem_num = 1;
@@ -49,9 +56,37 @@ int main() {
 	down.sem_op = -1;
 	down.sem_flg = 0;
 
-	while (1) {
-		printf("Waiting for players...")
-		execlp("clear", "clear", NULL);
+	*ready = 0;
+	*turn = 0;
+	
+	for(int i = 0; i < 9; i++) {
+		tabella[i] = '0';
 	}
+	
+	//write(1, "Waiting for players...", strlen("Waiting for players..."));
+
+	//printf("Waiting for players...");
+	//fflush(stdout);
+	while (*ready != 2) {
+		lineclear();
+		//printf("\33[2K\r"); //VT100 escape codes
+		usleep(1000 * 200);
+		printf("[%c] Waiting for players", loadAnim[animIndex]);
+		animIndex++;
+		if (animIndex > 3) {
+			animIndex = 0;
+		}
+		fflush(stdout);
+	}
+	system("clear");
+
+	while(1) {	
+		lineclear();
+		//printf("\033[0m");
+		usleep(1000 * 200);
+		printf("Turn Player[%d]", *turn);
+		fflush(stdout);
+	}
+	return 0;
 }
 
