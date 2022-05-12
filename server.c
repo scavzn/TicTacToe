@@ -12,7 +12,7 @@
 #define KEY_ARRAY 111
 #define KEY_READY 112
 
-int shmturn, shmtabella, shmready, semturn, semtabella;
+int shmturn, shmtabella, shmready, semturn2, semturn;
 int* turn;
 int* ready;
 
@@ -24,7 +24,7 @@ void fun(int sig) {
 	printf("\n");
     semctl(semturn, 1, IPC_RMID);
     shmctl(shmturn ,IPC_RMID, NULL);
-    semctl(semtabella, 1, IPC_RMID);
+    semctl(semturn2, 1, IPC_RMID);
     shmctl(shmtabella ,IPC_RMID, NULL);    
 	shmctl(shmready ,IPC_RMID, NULL);    
     exit(0);
@@ -44,7 +44,7 @@ int main() {
 	char *tabella = (char*) shmat(shmtabella, NULL, 0);
 
 	semturn = semget(KEY_TURN, 1 ,IPC_CREAT | IPC_EXCL | 0600);
-	semtabella = semget(KEY_ARRAY, 1 ,IPC_CREAT | IPC_EXCL | 0600);
+	semturn2 = semget(KEY_ARRAY, 1 ,IPC_CREAT | IPC_EXCL | 0600);
 
 	struct sembuf up;
 	up.sem_num = 1;
@@ -60,7 +60,7 @@ int main() {
 	*turn = 0;
 	
 	for(int i = 0; i < 9; i++) {
-		tabella[i] = '0';
+		tabella[i] = 43; //ascii bullet
 	}
 	
 	//write(1, "Waiting for players...", strlen("Waiting for players..."));
