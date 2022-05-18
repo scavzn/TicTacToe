@@ -25,9 +25,7 @@ void fun(int sig) {
 
 int main() {
 
-	int player;
-
-	int choice;
+	int player, choice;
 
 	signal(2, fun);
 
@@ -52,6 +50,11 @@ int main() {
 	down.sem_op = -1;
 	down.sem_flg = 0;
 
+	struct sembuf still;
+	down.sem_num = 1;
+	down.sem_op = 0;
+	down.sem_flg = 0;	
+
 	player = *ready;
     *ready += 1;
 
@@ -64,64 +67,68 @@ int main() {
 
 
 	while(1) {
-	printf("You are p[%d], turn[%d]", player, *turn);
-	for(int i = 0; i < 9; i++) {
-		if (i % 3 == 0) {
-			for (int j = 0; j < 2; j++) {
-				printf("\n");
+		printf("\e[1;1H\e[2J");	
+		printf("You are p[%d], turn[%d]", player, *turn);
+		for(int i = 0; i < 9; i++) {
+			if (i % 3 == 0) {
+				for (int j = 0; j < 2; j++) {
+					printf("\n");
+				}
 			}
+
+			printf("%c  ", tabella[i]);  //[0,1,2,3,5,6,7,8,9]
 		}
-		printf("%c  ", tabella[i]);  //[0,1,2,3,5,6,7,8,9]
-	}
 
-	printf("\n");
+		printf("\n");
 
-	switch(player) {
+		switch(player) {
 
-		case 0:
+			case 0:
 
-			switch(*turn) {
+				switch(*turn) {
 
-				case 0:
+					case 0:
 
-				scanf(" %d",&choice);
-				printf("\n");
-				tabella[choice - 1] = 'X';
-				*turn = *turn + 1;
-				break;
+					scanf(" %d",&choice);
+					printf("\n");
+					tabella[choice - 1] = 'X';
+					*turn = *turn + 1;
+					semop(semturn2, &up, 1);
+					break;
 
-				case 1:
-				while(*turn == 1) {
+					case 1:
+					//while(*turn == 1) {
+					//}
+					semop(semturn, &down, 1);
+
+					break;
 
 				}
+
 				break;
 
-			}
+			case 1:
 
-			break;
+				switch(*turn) {
 
-		case 1:
+					case 0:
+					//while(*turn == 0) {
+					//}
+					semop(semturn2, &down, 1);
+					break;
 
-			switch(*turn) {
+					case 1:
+					scanf(" %d",&choice);
+					printf("\n");
+					tabella[choice - 1] = 'O';
 
-				case 0:
-				while(*turn == 0) {
+					*turn = *turn - 1;
+					semop(semturn, &up, 1);
+					break;
 
 				}
+
 				break;
-
-				case 1:
-				scanf(" %d",&choice);
-				printf("\n");
-				tabella[choice - 1] = 'O';
-
-				*turn = *turn - 1;
-				break;
-
 			}
-
-			break;
 		}
-	}
 }
-
