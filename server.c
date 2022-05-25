@@ -114,7 +114,7 @@ int main() {
 	*event = -1;
 
 	for(int i = 0; i < 9; i++) {
-		tabella[i] = i + 49; //ascii bullet 43
+		tabella[i] = 43; //ascii bullet 43
 		wtabella[i] = 0;
 	}
 
@@ -125,7 +125,7 @@ int main() {
 
 	while (*event == -1) {
 		printLogo();
-		printf("Creato da M. Ambrosi e M. Ouassou\n");
+		printf("Created by M. Ambrosi & M. Ouassou\n");
 		usleep(1000 * 200);
 		system("clear");
 	}
@@ -138,7 +138,7 @@ int main() {
 			break;
 	}
 
-	while (*ready != 2) {
+	while (*ready != 2 && *event == 2) {
 		//lineclear();
 		//printf("\33[2K\r"); //VT100 escape codes
 		printLogo();
@@ -158,10 +158,12 @@ int main() {
 	while(checkWin() <= 0) {
 		//lineclear();
 		if (*event == 135) {
+			printLogo();
 			sleep(2);
 			terminate();
 		}
 		if (*event == 136) {
+			printLogo();
 			while (*event != 41) {
 			}
 			main();
@@ -175,15 +177,16 @@ int main() {
 	*ready = checkWin();
 	switch(*ready) {
 		case 3:
-			printf("\nplayer X win");
+			printf("\nPlayer X win");
 			break;
 		case 4:
-		 printf("\nplayer O win");
+		 printf("\nPlayer O win");
 			break;
 		case 5:
 			printf("\nDraw");
 			break;
 	}
+	printLogo();
 	while(!(*event == 30)) {
 	}
 	main();
