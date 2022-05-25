@@ -24,6 +24,42 @@ char* tabella;
 int* wtabella;
 int* event;
 
+void draw (char s) {
+  if(s == 'X'){
+    printf("\033[1;31m");
+    printf(" X ");
+    printf("\033[0m");
+  }
+  else{
+    printf(" %c ", s);
+  }
+}
+
+void grid(){
+  int index = 0;
+  printf("   |   |\n");
+  for(int i = 0; i < 2; i++){
+    draw(tabella[index]);
+    printf("|");
+    index++;
+    draw(tabella[index]);
+    printf("|");
+    index++;
+    draw(tabella[index]);
+    index++;
+
+    printf("\n___|___|___\n");
+    printf("   |   |\n");
+  }
+  draw(tabella[6]);
+  printf("|");
+  draw(tabella[7]);
+  printf("|");
+  draw(tabella[8]);
+
+  printf("\n   |   |\n");
+}
+
 void menu() {
   system("clear");
   printf("Welcome");
@@ -66,7 +102,6 @@ void menu() {
 
   }
 }
-
 
 void fun(int sig) {
     if (player == 0) {
@@ -134,20 +169,7 @@ int main() {
     printf("\n");
         while(1) {
       	    printf("You're are P[%d], P[%d] turn\n", player, *turn);
-            printf("     |     |     \n");
-            printf("  %c  |  %c  |  %c \n", tabella[0], tabella[1], tabella[2]);
-
-            printf("_____|_____|_____\n");
-            printf("     |     |     \n");
-
-            printf("  %c  |  %c  |  %c \n", tabella[3], tabella[4], tabella[5]);
-
-            printf("_____|_____|_____\n");
-            printf("     |     |     \n");
-
-            printf("  %c  |  %c  |  %c \n", tabella[6], tabella[7], tabella[8]);
-
-            printf("     |     |     \n\n");
+            grid();
 
       	   printf("\n");
 
@@ -199,10 +221,8 @@ int main() {
     }
     printf("\n");
     while(1) {
-
-  		printf("You're are P[%d], P[%d] turn", player, *turn);
       printf("You're are P[%d], P[%d] turn\n", player, *turn);
-      printf("     |     |     \n");
+      /**printf("     |     |     \n");
       printf("  %c  |  %c  |  %c \n", tabella[0], tabella[1], tabella[2]);
 
       printf("_____|_____|_____\n");
@@ -215,7 +235,8 @@ int main() {
 
       printf("  %c  |  %c  |  %c \n", tabella[6], tabella[7], tabella[8]);
 
-      printf("     |     |     \n\n");
+      printf("     |     |     \n\n");*/
+      grid();
 
      printf("\n");
 
