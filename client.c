@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,6 +22,10 @@ int* ready;
 char* tabella;
 int* wtabella;
 int* event;
+
+void ff(int sig){
+
+}
 
 void draw (char s) {
   if(s == 'X'){
@@ -114,8 +117,13 @@ void fun(int sig) {
 }
 
 int main() {
+  signal(SIGALRM, ff);
+  int animIndex = 0;
+  char loadAnim[] = {'/', '-', '\\', '|'};
   int magicCube[9] = {8, 1, 6, 3, 5, 7, 4, 9, 2};//per win condition
 	int choice;
+
+  printf("\033[37m\033[41m");
 
 	signal(2, fun);
 
@@ -148,11 +156,6 @@ int main() {
 	down.sem_op = -1;
 	down.sem_flg = 0;
 
-	struct sembuf still;
-	down.sem_num = 1;
-	down.sem_op = 0;
-	down.sem_flg = 0;
-
 	player = *ready;
 
   if (player >= 1 && !(*event == 2)) {
@@ -182,7 +185,9 @@ int main() {
       			 case 0:
                while(1){
                  printf("\nInsert position (1-9): ");
+                 alarm(15);
                  scanf("%d", &choice);
+                 alarm(0);
                  if((choice <= 9) && (choice >= 1)){
                    if((tabella[choice - 1] == 'O') || (tabella[choice - 1] == 'X')){
                        continue;
@@ -216,26 +221,22 @@ int main() {
             system("clear");
          }
   } else if (*event == 2){
-    while (*ready != 2) {
-
-    }
+  //  while (*ready != 2) {
+      /*
+      printf("[%c] Waiting for opponent", loadAnim[animIndex]);
+      animIndex++;
+      if (animIndex > 3) {
+        animIndex = 0;
+        */
+        system("gnome-terminal -e \"./client\"");
+      //}
+      //fflush(stdout);
+      //usleep(1000 * 200);
+      //system("clear");
+  //  }
     printf("\n");
     while(1) {
       printf("You're are P[%d], P[%d] turn\n", player, *turn);
-      /**printf("     |     |     \n");
-      printf("  %c  |  %c  |  %c \n", tabella[0], tabella[1], tabella[2]);
-
-      printf("_____|_____|_____\n");
-      printf("     |     |     \n");
-
-      printf("  %c  |  %c  |  %c \n", tabella[3], tabella[4], tabella[5]);
-
-      printf("_____|_____|_____\n");
-      printf("     |     |     \n");
-
-      printf("  %c  |  %c  |  %c \n", tabella[6], tabella[7], tabella[8]);
-
-      printf("     |     |     \n\n");*/
       grid();
 
      printf("\n");
@@ -254,7 +255,7 @@ int main() {
         *event = 41;
         sleep(1);
         system("clear");
-        main();
+        main();char loadAnim[] = {'/', '-', '\\', '|'};
       }
 
       sleep(1);
@@ -271,7 +272,9 @@ int main() {
   					case 0:
               while(1){
                 printf("\nInsert position (1-9): ");
+                alarm(15);
                 scanf("%d", &choice);
+                alarm(0);
                 if((choice <= 9) && (choice >= 1)){
                   if((tabella[choice - 1] == 'O') || (tabella[choice - 1] == 'X')){
                       continue;
@@ -298,14 +301,16 @@ int main() {
   				switch(*turn) {
 
   					case 0:
-  					while( (*turn == 0) && (*event < 134)) {
-  					}
-  					break;
+    					while( (*turn == 0) && (*event < 134)) {
+    					}
+    					break;
 
   					case 1:
               while(1){
                 printf("\nInsert position (1-9): ");
+                alarm(15);
                 scanf("%d", &choice);
+                alarm(0);
                 if((choice <= 9) && (choice >= 1)){
                   if((tabella[choice - 1] == 'O') || (tabella[choice - 1] == 'X')){
                     continue;
@@ -349,4 +354,5 @@ int main() {
     sleep(1);
     system("clear");
     main();
+    return 0;
 }
