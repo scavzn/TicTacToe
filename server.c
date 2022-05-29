@@ -9,7 +9,7 @@
 #include <signal.h>
 #include <fcntl.h>
 
-#define DIM 900
+#define DIM 1500
 #define KEY_TURN 115
 #define KEY_ARRAY 111
 #define KEY_READY 112
