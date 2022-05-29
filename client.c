@@ -24,6 +24,8 @@
 //event(69) invia segnale al server di terminare
 //event(1-2-3-4) gestisce modalità di gioco
 
+struct sembuf up;
+struct sembuf down;
 int shmturn, shmtabella, shmWinArr, shmevent, shmready, semturn2, semturn, shmevent, player;
 int* turn;
 int* ready;
@@ -33,10 +35,14 @@ int* event;
 
 void alarme(int sig){
   if (player == 0) {
+    semop(semturn, &down, 1);
     *event = 138;
+    semop(semturn, &up, 1);
   }
   else if (player == 1) {
+    semop(semturn, &down, 1);
     *event = 139;
+    semop(semturn, &up, 1);
     exit(0);
   }
 }
@@ -105,7 +111,9 @@ void menu() {
       menu();
       break;
     case 4:
+      semop(semturn, &down, 1);
       *event = 69;
+      semop(semturn, &up, 1);
       exit(0);
       break;
     default:
@@ -123,10 +131,14 @@ void menu() {
 void ctrlC(int sig) {
     if (player == 0) {
       printf("\nPlayer 'O' wins\n");
+      semop(semturn, &down, 1);
       *event = 135;
+      semop(semturn, &up, 1);
     }
     else if (player == 1) {
+      semop(semturn, &down, 1);
       *event = 136;
+      semop(semturn, &up, 1);
     }
     exit(0);
 }
@@ -137,8 +149,6 @@ int main() {
   char loadAnim[] = {'/', '-', '\\', '|'};
   int magicCube[9] = {8, 1, 6, 3, 5, 7, 4, 9, 2};//per win condition
 	int choice;
-
-  //printf("\033[37m\033[41m");
 
 	signal(2, ctrlC);
 
@@ -159,7 +169,7 @@ int main() {
   event = (int*) shmat(shmevent, NULL, 0);
 
 	semturn = semget(KEY_SEM1, 1 , 0600);
-	semturn2 = semget(KEY_SEM2, 1 , 0600);
+	//semturn2 = semget(KEY_SEM2, 1 , 0600);
 
 	struct sembuf up;
 	up.sem_num = 1;
@@ -177,7 +187,9 @@ int main() {
     printf("Not accessible yet.\n");
     exit(0);
   }
+  semop(semturn, &down, 1);
   *ready += 1;
+  semop(semturn, &up, 1);
 
   if (player == 0) {
     menu();
@@ -198,7 +210,9 @@ int main() {
                printf("\nPress ENTER to continue...");
                getchar();
                getchar();
+               semop(semturn, &down, 1);
                *event = 41;
+               semop(semturn, &up, 1);
                sleep(1);
                system("clear");
                main();
@@ -223,9 +237,11 @@ int main() {
                    break;
                  }
                }
+               semop(semturn, &down, 1);
       				 tabella[choice - 1] = 'X';
                wtabella[choice - 1] = magicCube[choice - 1] * 1;
       				 *turn = *turn + 1;
+               semop(semturn, &up, 1);
       				 break;
 
       			case 1://turno bot
@@ -240,9 +256,11 @@ int main() {
                 }
 
               }
+              semop(semturn, &down, 1);
               tabella[choice - 1] = 'O';
               wtabella[choice - 1] = magicCube[choice - 1] * 2;
               *turn = *turn - 1;
+              semop(semturn, &up, 1);
               break;
             }
             usleep(1000 * 200);
@@ -250,7 +268,9 @@ int main() {
          }
   } else if (*event == 2){
     system("x-terminal-emulator -e ./client");//apro terminale del giocatore 2 in automatico
+    semop(semturn, &down, 1);
     *event = 91;
+    semop(semturn, &up, 1);
     printf("\n");
     while(1) {
           printf("You're are P[%d], P[%d] turn\n", player, *turn);
@@ -268,7 +288,9 @@ int main() {
             printf("\nPress ENTER to continue...");
             getchar();
             getchar();
+            semop(semturn, &down, 1);
             *event = 41;
+            semop(semturn, &up, 1);
             sleep(1);
             system("clear");
             main();
@@ -282,7 +304,9 @@ int main() {
               printf("\nPress ENTER to continue...");
               getchar();
               getchar();
+              semop(semturn, &down, 1);
               *event = 41;
+              semop(semturn, &up, 1);
               sleep(1);
               system("clear");
               main();
@@ -300,7 +324,9 @@ int main() {
             printf("\nPress ENTER to continue...");
             getchar();
             getchar();
+            semop(semturn, &down, 1);
             *event = 41;
+            semop(semturn, &up, 1);
             sleep(1);
             system("clear");
             main();
@@ -336,9 +362,11 @@ int main() {
                     }
 
                   }
+                  semop(semturn, &down, 1);
         					tabella[choice - 1] = 'X';
                   wtabella[choice - 1] = magicCube[choice - 1] * 1;
         					*turn = *turn + 1;
+                  semop(semturn, &up, 1);
         					break;
 
       					case 1:
@@ -370,9 +398,11 @@ int main() {
                     }
 
                   }
+                  semop(semturn, &down, 1);
         					tabella[choice - 1] = 'O';
                   wtabella[choice - 1] = magicCube[choice - 1] * 2;
         					*turn = *turn - 1;
+                  semop(semturn, &up, 1);
         					break;
       				}
       				break;
@@ -401,7 +431,9 @@ int main() {
     printf("\nPress ENTER to continue...");
     getchar();
     getchar();
+    semop(semturn, &down, 1);
     *event = 30;
+    semop(semturn, &up, 1);
     sleep(1);
     system("clear");
     main();
