@@ -18,6 +18,10 @@
 #define KEY_READY 112
 #define KEY_EVENT 200
 
+//event(136) è vittoria forfeit per il giocatore 1
+//event(138) è vittoria per tempo scaduto per giocatore 2
+//event(139) è vittoria per tempo scaduto per giocatore 1
+
 int shmturn, shmtabella, shmWinArr, shmevent, shmready, semturn2, semturn, shmevent, player;
 int* turn;
 int* ready;
@@ -114,8 +118,9 @@ void menu() {
   }
 }
 
-void fun(int sig) {
+void ctrlC(int sig) {
     if (player == 0) {
+      printf("\nPlayer 'O' wins\n");
       *event = 135;
     }
     else if (player == 1) {
@@ -133,7 +138,7 @@ int main() {
 
   //printf("\033[37m\033[41m");
 
-	signal(2, fun);
+	signal(2, ctrlC);
 
 	shmturn = shmget(KEY_TURN, sizeof(int), 0600);
   if (shmturn == -1) {
