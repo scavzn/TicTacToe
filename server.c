@@ -7,7 +7,9 @@
 #include <unistd.h>
 #include <sys/sem.h>
 #include <signal.h>
+#include <fcntl.h>
 
+#define DIM 900
 #define KEY_TURN 115
 #define KEY_ARRAY 111
 #define KEY_READY 112
@@ -25,18 +27,18 @@ int* event;
 
 ///////////
 void printLogo() {
-  FILE *fptr;
-
-  fptr = fopen("art.txt", "r");
-
-  char c = fgetc(fptr);
-  while (c != EOF)
+  char str[DIM];
+  int id = open("art.txt", 0644, O_RDONLY);
+  int n = read(id, str, DIM);
+  int index = 0;
+  str[n] = 0;
+  printf("\033[1;31m");//scrivo in rosso
+  while (str[index] != 0)
   {
-      printf ("%c", c);
-      c = fgetc(fptr);
+      printf ("%c", str[index]);
+      index++;
   }
-
-  fclose(fptr);
+  printf("\033[0m");//reset del colore
 }
 /////////
 
@@ -162,7 +164,7 @@ int main() {
 			sleep(2);
 			terminate();
 		}
-		if (*event == 136) {
+		if (*event == 136 || *event == 138 || *event == 139) {
 			printLogo();
 			while (*event != 41) {
 			}
@@ -175,6 +177,7 @@ int main() {
 		system("clear");
 	}
 	*ready = checkWin();
+  printLogo();
 	switch(*ready) {
 		case 3:
 			printf("\nPlayer X win");
@@ -186,7 +189,6 @@ int main() {
 			printf("\nDraw");
 			break;
 	}
-	printLogo();
 	while(!(*event == 30)) {
 	}
 	main();
