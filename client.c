@@ -8,7 +8,9 @@
 #include <sys/sem.h>
 #include <signal.h>
 #include <time.h>
+#include <fcntl.h>
 
+#define DIM 1500
 #define TEMPO 15
 #define KEY_TURN 115
 #define KEY_SEM1 170
@@ -33,6 +35,23 @@ char* tabella;
 int* wtabella;
 int* event;
 
+///////////
+void printLogo() {
+  char str[DIM];
+  int id = open("art2.txt", 0644, O_RDONLY);
+  int n = read(id, str, DIM);
+  int index = 0;
+  str[n] = 0;
+  printf("\033[1;31m");//scrivo in rosso
+  while (str[index] != 0)
+  {
+      printf ("%c", str[index]);
+      index++;
+  }
+  printf("\033[0m");//reset del colore
+}
+/////////
+
 void alarme(int sig){
   if (player == 0) {
     semop(semturn, &down, 1);
@@ -51,6 +70,10 @@ void draw (char s) {
   if(s == 'X'){
     printf("\033[1;31m");
     printf(" X ");
+    printf("\033[0m");
+  }else if(s == 'O'){
+    printf("\033[1;37m");
+    printf(" O ");
     printf("\033[0m");
   }
   else{
@@ -85,7 +108,7 @@ void grid(){
 
 void menu() {
   system("clear");
-  printf("TRIS");
+  printLogo();
   printf("\nChoose 1-4");
   printf("\n\n1) P1 vs CPU");
   printf("\n2) P1 vs P2");
