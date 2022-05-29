@@ -21,6 +21,8 @@
 //event(136) è vittoria forfeit per il giocatore 1
 //event(138) è vittoria per tempo scaduto per giocatore 2
 //event(139) è vittoria per tempo scaduto per giocatore 1
+//event(69) invia segnale al server di terminare
+//event(1-2-3-4) gestisce modalità di gioco
 
 int shmturn, shmtabella, shmWinArr, shmevent, shmready, semturn2, semturn, shmevent, player;
 int* turn;
