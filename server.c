@@ -65,7 +65,6 @@ void terminate() {
 		printf("\n");
 		semctl(semturn, 1, IPC_RMID);
 		shmctl(shmturn ,IPC_RMID, NULL);
-		semctl(semturn2, 1, IPC_RMID);
 		shmctl(shmtabella ,IPC_RMID, NULL);
 		shmctl(shmready ,IPC_RMID, NULL);
 		shmctl(shmWinArr ,IPC_RMID, NULL);
@@ -98,8 +97,8 @@ int main() {
 	wtabella = (int*) shmat(shmWinArr, NULL, 0);
 	event = (int*) shmat(shmevent, NULL, 0);
 
-	semturn = semget(KEY_SEM1, 1 , 0600);
-	semturn2 = semget(KEY_SEM2, 1 , 0600);
+	semturn = semget(KEY_SEM1, 1 , IPC_CREAT | IPC_EXCL | 0600);
+	//semturn2 = semget(KEY_SEM2, 1 , 0600);
 
 	struct sembuf up;
 	up.sem_num = 1;
@@ -111,19 +110,18 @@ int main() {
 	down.sem_op = -1;
 	down.sem_flg = 0;
 
+  semop(semturn, &down, 1);
 	*ready = 0;
 	*turn = 0;
 	*event = -1;
+  semop(semturn, &up, 1);
 
 	for(int i = 0; i < 9; i++) {
+    semop(semturn, &down, 1);
 		tabella[i] = 43; //ascii bullet 43
 		wtabella[i] = 0;
+    semop(semturn, &up, 1);
 	}
-
-	//write(1, "Waiting for players...", strlen("Waiting for players..."));
-
-	//printf("Waiting for players...");
-	//fflush(stdout);
 
 	while (*event == -1) {
 		printLogo();
@@ -141,8 +139,6 @@ int main() {
 	}
 
 	while (*ready != 2 && *event == 2) {
-		//lineclear();
-		//printf("\33[2K\r"); //VT100 escape codes
 		printLogo();
 		printf("[%c] Waiting for players", loadAnim[animIndex]);
 		animIndex++;
@@ -158,7 +154,6 @@ int main() {
 	}
 
 	while(checkWin() <= 0) {
-		//lineclear();
 		if (*event == 135) {
 			printLogo();
 			sleep(2);
@@ -176,7 +171,11 @@ int main() {
 		usleep(1000 * 200);
 		system("clear");
 	}
+
+  semop(semturn, &down, 1);
 	*ready = checkWin();
+  semop(semturn, &up, 1);
+
   printLogo();
 	switch(*ready) {
 		case 3:
