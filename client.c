@@ -1,3 +1,6 @@
+/* 
+Author(s): Ambrosi Marco, Ouassou Mehdi
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
