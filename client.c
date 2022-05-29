@@ -393,6 +393,8 @@ int main() {
         					break;
 
       					case 1:
+                  printf("Wait for the opponent's choice...");
+                  fflush(stdout);
         					while((*turn == 1) && (*event < 135)) {}
         					break;
 
@@ -404,6 +406,8 @@ int main() {
       				switch(*turn) {
 
       					case 0:
+                  printf("Wait for the opponent's choice...");
+                  fflush(stdout);
         					while( (*turn == 0) && (*event < 134)) {}
         					break;
 
