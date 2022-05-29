@@ -8,6 +8,8 @@
 #include <sys/sem.h>
 #include <signal.h>
 #include <time.h>
+
+#define TEMPO 15
 #define KEY_TURN 115
 #define KEY_SEM1 170
 #define KEY_SEM2 171
@@ -23,8 +25,14 @@ char* tabella;
 int* wtabella;
 int* event;
 
-void ff(int sig){
-
+void alarme(int sig){
+  if (player == 0) {
+    *event = 138;
+  }
+  else if (player == 1) {
+    *event = 139;
+    exit(0);
+  }
 }
 
 void draw (char s) {
@@ -65,7 +73,7 @@ void grid(){
 
 void menu() {
   system("clear");
-  printf("Welcome");
+  printf("TRIS");
   printf("\nChoose 1-4");
   printf("\n\n1) P1 vs CPU");
   printf("\n2) P1 vs P2");
@@ -117,13 +125,13 @@ void fun(int sig) {
 }
 
 int main() {
-  signal(SIGALRM, ff);
+  signal(SIGALRM, alarme);
   int animIndex = 0;
   char loadAnim[] = {'/', '-', '\\', '|'};
   int magicCube[9] = {8, 1, 6, 3, 5, 7, 4, 9, 2};//per win condition
 	int choice;
 
-  printf("\033[37m\033[41m");
+  //printf("\033[37m\033[41m");
 
 	signal(2, fun);
 
@@ -176,6 +184,19 @@ int main() {
 
       	   printf("\n");
 
+           if (*event == 138) {
+               system("clear");
+               printf("Lose by timeout\n");
+               printf("Player 'O' wins");
+               printf("\nPress ENTER to continue...");
+               getchar();
+               getchar();
+               *event = 41;
+               sleep(1);
+               system("clear");
+               main();
+               //char loadAnim[] = {'/', '-', '\\', '|'};
+             }
            sleep(1);
 
            if(*ready >= 3){
@@ -185,7 +206,7 @@ int main() {
       			 case 0:
                while(1){
                  printf("\nInsert position (1-9): ");
-                 alarm(15);
+                 alarm(TEMPO);
                  scanf("%d", &choice);
                  alarm(0);
                  if((choice <= 9) && (choice >= 1)){
@@ -221,114 +242,137 @@ int main() {
             system("clear");
          }
   } else if (*event == 2){
-  //  while (*ready != 2) {
-      /*
-      printf("[%c] Waiting for opponent", loadAnim[animIndex]);
-      animIndex++;
-      if (animIndex > 3) {
-        animIndex = 0;
-        */
-        system("gnome-terminal -e \"./client\"");
-      //}
-      //fflush(stdout);
-      //usleep(1000 * 200);
-      //system("clear");
-  //  }
+    system("x-terminal-emulator -e ./client");//apro terminale del giocatore 2 in automatico
+    *event = 91;
     printf("\n");
     while(1) {
-      printf("You're are P[%d], P[%d] turn\n", player, *turn);
-      grid();
+          printf("You're are P[%d], P[%d] turn\n", player, *turn);
+          grid();
 
-     printf("\n");
+         printf("\n");
 
-     sleep(1);
+         sleep(1);
 
-      if (*event == 135) {
-        printf("Win by forfeit\n");
-        exit(0);
-      }
-      else if (*event == 136) {
-        printf("Win by forfeit");
-        printf("\nPress ENTER to continue...");
-        getchar();
-        getchar();
-        *event = 41;
-        sleep(1);
-        system("clear");
-        main();char loadAnim[] = {'/', '-', '\\', '|'};
-      }
+          if (*event == 135) {//player 2 vince
+            printf("Win by forfeit\n");
+            exit(0);
+          } else if (*event == 136) {
+            printf("Win by forfeit");
+            printf("\nPress ENTER to continue...");
+            getchar();
+            getchar();
+            *event = 41;
+            sleep(1);
+            system("clear");
+            main();
+            //char loadAnim[] = {'/', '-', '\\', '|'};
+          }
+          else if (*event == 138) {
+            if (player == 0) {
+              system("clear");
+              printf("Lose by timeout\n");
+              printf("Player 'O' wins");
+              printf("\nPress ENTER to continue...");
+              getchar();
+              getchar();
+              *event = 41;
+              sleep(1);
+              system("clear");
+              main();
+              //char loadAnim[] = {'/', '-', '\\', '|'};
+            }
+          else {
+            exit(0);
+          }
+        }
+        else if (*event == 139) {
+          if (player == 0) {
+            system("clear");
+            printf("Win by timeout\n");
+            printf("Player 'X' wins");
+            printf("\nPress ENTER to continue...");
+            getchar();
+            getchar();
+            *event = 41;
+            sleep(1);
+            system("clear");
+            main();
+            //char loadAnim[] = {'/', '-', '\\', '|'};
+          }
+        else {
+          exit(0);
+        }
+        }
 
-      sleep(1);
+          sleep(1);
 
-      if(*ready >= 3){
-        break;
-      }
+          if(*ready >= 3){
+            break;
+          }
 
-  		switch(player) {
+      		switch(player) {
 
-  			case 0:
+      			case 0:
 
-  				switch(*turn) {
-  					case 0:
-              while(1){
-                printf("\nInsert position (1-9): ");
-                alarm(15);
-                scanf("%d", &choice);
-                alarm(0);
-                if((choice <= 9) && (choice >= 1)){
-                  if((tabella[choice - 1] == 'O') || (tabella[choice - 1] == 'X')){
-                      continue;
+      				switch(*turn) {
+      					case 0:
+                  while(1){
+                    printf("\nInsert position (1-9): ");
+                    alarm(TEMPO);
+                    scanf("%d", &choice);
+                    alarm(0);
+                    if((choice <= 9) && (choice >= 1)){
+                      if((tabella[choice - 1] == 'O') || (tabella[choice - 1] == 'X')){
+                          continue;
+                      }
+                      break;
+                    }
+
                   }
-                  break;
-                }
+        					tabella[choice - 1] = 'X';
+                  wtabella[choice - 1] = magicCube[choice - 1] * 1;
+        					*turn = *turn + 1;
+        					break;
 
-              }
-    					tabella[choice - 1] = 'X';
-              wtabella[choice - 1] = magicCube[choice - 1] * 1;
-    					*turn = *turn + 1;
-    					break;
+      					case 1:
+        					while((*turn == 1) && (*event < 135)) {}
+        					break;
 
-  					case 1:
-    					while((*turn == 1) && (*event < 135)) {
-    					}
-    					break;
+      				}
+      				break;
 
-  				}
-  				break;
+      			case 1:
 
-  			case 1:
+      				switch(*turn) {
 
-  				switch(*turn) {
+      					case 0:
+        					while( (*turn == 0) && (*event < 134)) {}
+        					break;
 
-  					case 0:
-    					while( (*turn == 0) && (*event < 134)) {
-    					}
-    					break;
+      					case 1:
+                  while(1){
+                    printf("\nInsert position (1-9): ");
+                    alarm(TEMPO);
+                    scanf("%d", &choice);
+                    alarm(0);
+                    if((choice <= 9) && (choice >= 1)){
+                      if((tabella[choice - 1] == 'O') || (tabella[choice - 1] == 'X')){
+                        continue;
+                      }
+                      break;
+                    }
 
-  					case 1:
-              while(1){
-                printf("\nInsert position (1-9): ");
-                alarm(15);
-                scanf("%d", &choice);
-                alarm(0);
-                if((choice <= 9) && (choice >= 1)){
-                  if((tabella[choice - 1] == 'O') || (tabella[choice - 1] == 'X')){
-                    continue;
                   }
-                  break;
-                }
-
-              }
-    					tabella[choice - 1] = 'O';
-              wtabella[choice - 1] = magicCube[choice - 1] * 2;
-    					*turn = *turn - 1;
-    					break;
-  				}
-  				break;
-  			}
-        usleep(1000 * 200);
-        system("clear");
-  		}
+        					tabella[choice - 1] = 'O';
+                  wtabella[choice - 1] = magicCube[choice - 1] * 2;
+        					*turn = *turn - 1;
+        					break;
+      				}
+      				break;
+      			}
+            usleep(1000 * 200);
+            system("clear");
+      	}
 
   }
 
